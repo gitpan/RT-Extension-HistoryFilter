@@ -4,23 +4,24 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
-my @types = sort qw(Create Status CommentEmailRecord EmailRecord Correspond 
-    Comment CustomField Untake Take Force Steal Give AddWatcher DelWatcher
-    Subject AddLink DeleteLink Told Set PurgeTransaction
-    AddReminder OpenReminder ResolveReminder);
+my @types;
+{
+    package RT::Transaction;
+    our %_BriefDescriptions;
+    @types = sort keys %_BriefDescriptions;
+}
 
 $RT::Config::META{'HistoryFilterTypes'} = {
-    Section         => 'RT::Extension::HistoryFilter',
+    Section         => 'Ticket display',
     Overridable     => 1,
-    SortOrder       => 1,
+    SortOrder       => 99,
     Widget          => '/Widgets/Form/Select',
     WidgetArguments => {
         Description => 'Transaction types that will be shown on the ticket display page', #loc
         Values      => [ @types ],
         Multiple    => 1,
-        Size        => 5,
         },
 };
 
@@ -45,15 +46,21 @@ is an extended version of RT::Extension::BriefHistory
 
 =over
 
-=item perl Makefile.PL
+=item C<perl Makefile.PL>
 
-=item make
+=item C<make>
 
-=item make install
+=item C<make install>
 
-=item Edit your /opt/rt4/etc/RT_SiteConfig.pm
+May need root permissions
 
-Add this line:
+=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+
+If you are using RT 4.2 or greater, add this line:
+
+    Plugin('RT::Extension::HistoryFilter');
+
+For RT 4.0, add this line:
 
     Set(@Plugins, qw(RT::Extension::HistoryFilter));
 
@@ -73,7 +80,7 @@ Christian Loos <cloos@netsandbox.de>
 
 =head1 LICENCE AND COPYRIGHT
  
-Copyright (C) 2010-2013, Christian Loos.
+Copyright (C) 2010-2014, Christian Loos.
  
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
